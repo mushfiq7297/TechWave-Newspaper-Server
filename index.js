@@ -29,13 +29,19 @@ async function run() {
    
 
     const newsCollection = client.db("techwaveDB").collection("news");
+    
 
     app.get('/allArticle', async (req, res) => {
         const result = await newsCollection.find().toArray();
         res.send(result);
       });
 
-
+//CREATE data
+app.post("/addArticles", async (req, res) => {
+  console.log(req.body);
+  const result = await newsCollection.insertOne(req.body);
+  res.send(result);
+});
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
