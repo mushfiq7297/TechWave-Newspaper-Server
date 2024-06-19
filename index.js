@@ -254,6 +254,23 @@ app.get("/premiumArticles", verifyToken, verifySubscription, async (req, res) =>
   }
 });
 
+ 
+// Endpoint to increment the view count
+app.put("/articles/:id/view", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $inc: { viewcount: 1 },
+    };
+    const result = await newsCollection.updateOne(filter, updateDoc);
+    res.json(result);
+  } catch (error) {
+    console.error("Error updating view count:", error);
+    res.status(500).json({ error: "Error updating view count" });
+  }
+});
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
