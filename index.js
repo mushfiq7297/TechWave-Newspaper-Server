@@ -272,6 +272,44 @@ app.put("/articles/:id/view", async (req, res) => {
 });
 
 
+app.get("/admin/publication-stats", async (req, res) => {
+  try {
+    const publicationStats = await newsCollection.aggregate([
+      {
+        $group: {
+          _id: "$publisher",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          name: "$_id",
+          count: 1,
+        },
+      },
+    ]).toArray();
+
+    res.json(publicationStats);
+  } catch (error) {
+    console.error("Error fetching publication stats:", error);
+    res.status(500).send({ message: "Error fetching publication stats" });
+  }
+});
+
+ // Endpoint to fetch article view counts
+ app.get("/admin/article-viewcounts", async (req, res) => {
+  try {
+    // Fetch article titles and view counts
+    const projection = { title: 1, viewcount: 1, _id: 0 }; // Include only title and viewcount fields
+    const articles = await newsCollection.find({}, { projection }).toArray();
+    res.json(articles);
+  } catch (error) {
+    console.error("Error fetching article view counts:", error);
+    res.status(500).json({ error: "Error fetching article view counts" });
+  }
+});
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
